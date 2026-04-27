@@ -125,6 +125,7 @@ Ejemplo de ejecución local:
 ngrok http --url=URL_NGROK.ngrok-free.dev 5678
 ```
 
+Archivo YAML
 ```bash
 name: n8n-test
 
