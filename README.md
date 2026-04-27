@@ -1,4 +1,9 @@
 # N8N espol
+Change User
+```bash
+sudo chown -R manager:manager /data/n8n-compose/
+```
+
 ### Con docker
 Primer asegurar las variables de entorno o modificar manualmente:
 ```bash
