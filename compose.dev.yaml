@@ -1,0 +1,40 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=develop
+      - N8N_SECURE_COOKIE=false  # Obligatorio para entrar sin HTTPS
+      - WEBHOOK_URL=http://${IP_LOCAL}:5678/ 
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+      # Base de Datos
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=saacdata
+      - DB_POSTGRESDB_HOST=ds_postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRESDB_SCHEMA=n8n
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./local-files:/files
+    networks:
+      - ds_network
+
+networks:
+  ds_network:
+    external: true
+    name: datalakehouseonpremise_ds_network
+
+volumes:
+  n8n_data:
