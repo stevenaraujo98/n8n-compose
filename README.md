@@ -74,7 +74,7 @@ sudo docker compose stop
 sudo docker compose -f compose.dev.yaml down
 sudo docker compose -f compose.dev.yaml down -v --rmi all
 sudo docker compose -f compose.test.yaml stop
-sudo docker compose -f compose.test.yaml down
+sudo docker compose -f compose.test.yaml down -v --rmi all
 
 sudo docker exec -it ds_postgres psql -U postgres -d saacdata -c "DELETE FROM n8n.credentials_entity;"
 ```
