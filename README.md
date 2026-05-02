@@ -56,6 +56,7 @@ Para correr y detener
 sudo docker compose up -d
 sudo docker compose -f compose.dev.yaml up -d
 sudo docker compose -f compose.test.yaml up -d
+docker compose -f compose.local.yaml up -d
 
 
 sudo docker logs -f n8ncon
@@ -69,13 +70,24 @@ sudo docker compose -f compose.test.yaml logs -f
 sudo docker compose -f compose.test.yaml logs -f n8n
 sudo docker compose -f compose.test.yaml logs -f ngrok
 
+docker compose -f compose.local.yaml logs -f 
+docker compose -f compose.local.yaml logs -f n8n
+docker compose -f compose.local.yaml logs -f ngrok
+docker compose -f compose.local.yaml logs -f ds_postgres
+
 
 sudo docker compose stop
+# down ese comando elimina los contenedores.
+# -v también borra los volúmenes (postgres + n8n data)
 sudo docker compose -f compose.dev.yaml down
 sudo docker compose -f compose.dev.yaml down -v --rmi all
 sudo docker compose -f compose.test.yaml stop
 sudo docker compose -f compose.test.yaml down -v --rmi all
+docker compose -f compose.local.yaml stop
+docker compose -f compose.local.yaml down -v --rmi all
 
+
+docker compose -f compose.local.yaml start
 sudo docker exec -it ds_postgres psql -U postgres -d saacdata -c "DELETE FROM n8n.credentials_entity;"
 ```
 

@@ -1,0 +1,1212 @@
+{
+  "name": "telegram demo peluqueria",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=# Rol  \nEres el **Asistente Virtual de la Barbería La Elegancia**, un experto en atención al cliente, amable, preciso y ágil, especializado en la gestión de citas para cortes de cabello y servicios de barbería en español.  \n\n# Objetivo  \nGuiar al cliente desde la elección del servicio hasta la confirmación de su cita, recopilando todos los detalles necesarios (tipo de corte, extras y horario), sin necesidad de formularios externos.  \n\n# Contexto  \nTu función es **agilizar la reserva de citas** en la barbería. Debes ayudar al cliente a definir el tipo de corte, servicios adicionales como diseño o barba, y coordinar el horario de atención de forma clara y rápida.  \n\n# SOP (Procedimiento Operativo)  \n\n1. **Saludo y Servicios**:  \n   * Preséntate como el asistente de **La Elegancia** 💈.  \n   * Menciona los servicios disponibles:  \n     - Corte normal: **$5**  \n     - Corte con diseño: **$8**  \n     - Barba: **$4**  \n   * Pregunta qué servicio desea y para qué día/hora.  \n\n2. **Identificación del Servicio**:  \n   * Confirma el tipo de corte: normal o con diseño.  \n   * Pregunta si desea agregar servicio de barba.  \n   * Si el cliente no está seguro, sugiere opciones según lo que mencione.  \n\n3. **Detalles del Estilo (Personalización)**:  \n   * Si es corte con diseño, pregunta qué tipo de diseño desea (líneas, figuras, etc.).  \n   * Confirma cualquier preferencia adicional (ej: degradado, clásico, moderno).  \n\n4. **Logística y Agenda**:  \n   * Solicita el horario deseado.  \n   * Verifica disponibilidad antes de confirmar.  \n   * Si no hay espacio, ofrece horarios alternativos cercanos.  \n\n5. **Resumen y Confirmación**:  \n   * Resume el servicio seleccionado + precio total.  \n   * Confirma la cita con fecha y hora.  \n\n6. **Cierre**:  \n   * Confirma el nombre del cliente.  \n   * Indica que lo esperan en **La Elegancia** 💈.  \n   * Mantén el cierre amigable y profesional.  \n\n# Instrucciones  \n\n* Usa un **tono cercano, fresco y profesional**, típico de barbería.  \n* Usa emojis relacionados (💈✂️🔥) sin exagerar.  \n* Sé claro y directo con horarios y disponibilidad.  \n* Si el cliente duda, recomienda opciones simples.  \n* Mantén respuestas cortas y ágiles.  \n* Si el cliente se desvía del tema, redirígelo a concretar su cita.  \n\n# Ejemplo de Interacción  \n\n**Cliente:** Hola  \n**Agente:** ¡Hola! 💈 Soy el asistente de **La Elegancia**.  \n\nEstos son nuestros servicios:  \n✂️ Corte normal: $5  \n🔥 Corte con diseño: $8  \n🧔 Barba: $4  \n\n¿Qué servicio te gustaría y para qué día o hora?  \n\n**Cliente:** Un corte con diseño para hoy en la tarde  \n**Agente:** ¡De una! 🔥  \n\n¿Qué tipo de diseño te gustaría hacerte? (líneas, algo sencillo, más elaborado)  \n\n**Cliente:** Algo sencillo con líneas  \n**Agente:** Perfecto, quedará 🔝  \n\n¿Deseas agregar servicio de barba por $4?  \n\n**Cliente:** Sí  \n\n**Agente:** Listo 💈  \n\n**Resumen de tu cita:**  \n- Corte con diseño: $8  \n- Barba: $4  \n**Total: $12**  \n\n¿A qué hora en la tarde te queda mejor?  \n\n**Cliente:** 4pm  \n\n**Agente:** ✅ Te agendo a las 4pm  \n\n¿A nombre de quién reservo?  \n\n**Cliente:** Juan  \n\n**Agente:** Listo Juan 🙌  \nTe esperamos en **La Elegancia** 💈✂️  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2816,
+        992
+      ],
+      "id": "e5e36a0c-ce65-415e-9463-29319a2f2eca",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -3680,
+        1344
+      ],
+      "id": "ad6a3cba-eec3-402b-8661-c2f6bcb230e5",
+      "name": "When chat message received",
+      "webhookId": "7d758f4e-639f-4de5-a030-0654610d908e"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "frequencyPenalty": 0,
+          "maxTokens": 700,
+          "temperature": 0.4,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3680,
+        2064
+      ],
+      "id": "ad358ba5-e5b4-41f7-9739-f3a951be9ade",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sendTo": "josuealexandercs15@gmail.com",
+        "subject": "Error en chatbot",
+        "message": "=n8n automation name: {{ $workflow.name }}\nmessage: {{ $json.error }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -2416,
+        1024
+      ],
+      "id": "1e0ed7a2-f7ab-4929-9c4e-50943e5942df",
+      "name": "Send a message",
+      "webhookId": "ae2fb8f9-bfff-4ecf-9dfe-6d83b9aa350f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "C60mRLThqKACkR4p",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        -2752,
+        1216
+      ],
+      "id": "5adcb153-9eb2-41a8-99be-bb8a2823ff60",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2880,
+        1216
+      ],
+      "id": "17af0a88-a236-49ce-aadd-c20509465d91",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "67803798-c055-4c24-839e-7cf73c829eed",
+              "name": "chatInput",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "04893761-552f-4055-9162-a5711c0d0dcd",
+              "name": "sessionId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "a2f0666c-8a6d-41ff-9f36-8b2931df2ddd",
+              "name": "fromTelegram",
+              "value": "=True",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3456,
+        1152
+      ],
+      "id": "1c04ffd7-b5b5-4217-abdd-25a007cb85e9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "autolavadojc.ec@gmail.com",
+          "mode": "list",
+          "cachedResultName": "autolavadojc.ec@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -2624,
+        1216
+      ],
+      "id": "c8f5daa2-af6a-44cc-929f-9c6595e8fc4e",
+      "name": "Consultar disponibilidad",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "rqqFgDNP5MLbpSeh",
+          "name": "Google Calendar account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "autolavadojc.ec@gmail.com",
+          "mode": "list",
+          "cachedResultName": "autolavadojc.ec@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "sendUpdates": "all",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -2496,
+        1216
+      ],
+      "id": "848f5865-fe13-4194-ae13-808ee61ba07d",
+      "name": "Crear evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "rqqFgDNP5MLbpSeh",
+          "name": "Google Calendar account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1de30a58-d0be-4825-9630-40e3a6cfb2ef",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "98e3502f-a600-4525-9d78-2810fd700af8",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "^.{0,150}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3232,
+        1232
+      ],
+      "id": "73d6cf20-8b01-44f0-9f03-ec22898a038c",
+      "name": "If its on the valid char length boundary"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "67803798-c055-4c24-839e-7cf73c829eed",
+              "name": "chatInput",
+              "value": "=Mensaje del sistema: Por favor escriba un mensaje de texto cuya longitud sea 150 caracteres (20 - 30 palaabra aprox) como máximo. ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2752,
+        1456
+      ],
+      "id": "fba6fa30-7c2c-4cca-b751-a85fd43177e1",
+      "name": "Validation message"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "operation": "get",
+        "tableId": "cb_customer",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ String($('WhatsApp Trigger').item.json.contacts[0].wa_id) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2144,
+        544
+      ],
+      "id": "4032201f-0d20-4a24-b2c1-d15f38ef7c4e",
+      "name": "Find customer",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "714db64f-3d14-48cd-a643-a4145c9f636b",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1920,
+        544
+      ],
+      "id": "9f18943b-af6f-4436-9ba8-7570292721e9",
+      "name": "if customer exists"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "cb_customer",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1696,
+        624
+      ],
+      "id": "e91ea183-b4be-4206-bdf9-a74db8caaf6d",
+      "name": "create customer",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "cb_bot",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "keyValue": "={{ $('WhatsApp Trigger').item.json.metadata.display_phone_number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1248,
+        544
+      ],
+      "id": "dde06824-add5-475e-8b80-3bde4fe87758",
+      "name": "Find bot",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "cb_bot",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "=Meta testing bot"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.metadata.display_phone_number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        624
+      ],
+      "id": "ba52dfaf-1f17-4e5a-8edd-72ac8fd88d52",
+      "name": "create bot",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "714db64f-3d14-48cd-a643-a4145c9f636b",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1024,
+        544
+      ],
+      "id": "530afdbc-8200-4bd0-bcdf-4ca0de65f57b",
+      "name": "if bot exists"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "714db64f-3d14-48cd-a643-a4145c9f636b",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        544
+      ],
+      "id": "856b6ba8-ac6e-48e7-8591-064361a90cb9",
+      "name": "if conversation exists"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "cb_conversation",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('Set customer id').item.json.customerId }}"
+            },
+            {
+              "keyName": "chatbot_id",
+              "keyValue": "={{ $('Set bot id').item.json.botId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        544
+      ],
+      "id": "c72463f3-a1c7-4ae4-ba27-a28239813cbe",
+      "name": "Find conversation",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "cb_conversation",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Set customer id').item.json.customerId }}"
+            },
+            {
+              "fieldId": "chatbot_id",
+              "fieldValue": "={{ $('Set bot id').item.json.botId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        96,
+        624
+      ],
+      "id": "24d4a3f5-2ea6-4edf-8d7e-a94ef49d0d34",
+      "name": "create conversation",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "cb_message",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "conversation_id",
+              "fieldValue": "={{ $('Set conversation id').item.json.conversationId }}"
+            },
+            {
+              "fieldId": "sender",
+              "fieldValue": "customer"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        544,
+        544
+      ],
+      "id": "c9e09894-4a58-48f2-8c95-9c0f7c71a70c",
+      "name": "create customer message",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "cb_message",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "conversation_id",
+              "fieldValue": "={{ $('Set conversation id').item.json.conversationId }}"
+            },
+            {
+              "fieldId": "sender",
+              "fieldValue": "chatbot"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('AI Agent').item.json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        768,
+        544
+      ],
+      "id": "480b0c76-bd56-4bd0-b9cc-41276de0993e",
+      "name": "create bot message",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7099624b-8a59-40a4-b338-8a6750f9195d",
+              "name": "customerId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1472,
+        544
+      ],
+      "id": "8b775cff-c087-4576-bde3-436f46f6e674",
+      "name": "Set customer id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7099624b-8a59-40a4-b338-8a6750f9195d",
+              "name": "botId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        544
+      ],
+      "id": "16eb7aba-5100-4c49-b17e-994f85e683c5",
+      "name": "Set bot id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7099624b-8a59-40a4-b338-8a6750f9195d",
+              "name": "conversationId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        544
+      ],
+      "id": "32213411-07bb-4db2-add6-da1d1700956b",
+      "name": "Set conversation id"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        1120
+      ],
+      "id": "6e5d12d0-a338-4548-a42a-36531061ebf4",
+      "name": "No Operation, do nothing",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3680,
+        768
+      ],
+      "id": "becd6e2a-fa43-4a62-920d-811767719d17",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "tableId": "heartbeat"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3456,
+        768
+      ],
+      "id": "8f4b865d-86f5-419b-8b85-195cb4ac296d",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Z01A2oSV0IIGjy4m",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 192,
+        "width": 512
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3776,
+        736
+      ],
+      "typeVersion": 1,
+      "id": "edf5c5c0-02f6-45f1-bbfe-692de7ceb47f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }} {{ $json.chatInput }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1936,
+        896
+      ],
+      "id": "104ae4ed-a66f-475e-af7b-60c5412261da",
+      "name": "Send a text message",
+      "webhookId": "1897e8aa-8fc0-4aeb-bfdd-8b0065a4fc65",
+      "credentials": {
+        "telegramApi": {
+          "id": "hs9kSkKrA1md9UeN",
+          "name": "La elegancia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3680,
+        1136
+      ],
+      "id": "cca5f898-03a3-4f5f-9203-f127b17727cc",
+      "name": "Telegram Trigger",
+      "webhookId": "daf4f461-4902-4885-9211-dff5cb4c6f57",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "hs9kSkKrA1md9UeN",
+          "name": "La elegancia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxOutputTokens": 700,
+          "temperature": 0.4,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3008,
+        1216
+      ],
+      "id": "e769667b-cb27-4065-bfc9-71921bdd3bfd",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yQ5g9NkzDBqgkG3j",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "391aaf77-819c-4ac9-ad1c-e5119ab20620",
+              "leftValue": "={{ $('Edit Fields').item.json.fromTelegram }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2416,
+        880
+      ],
+      "id": "ce0cd221-defe-48a0-ba68-aea5d098605d",
+      "name": "If message from WS"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If message from WS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If its on the valid char length boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar disponibilidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If its on the valid char length boundary": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validation message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find customer": {
+      "main": [
+        [
+          {
+            "node": "if customer exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if customer exists": {
+      "main": [
+        [
+          {
+            "node": "Set customer id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "create customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create customer": {
+      "main": [
+        [
+          {
+            "node": "Set customer id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find bot": {
+      "main": [
+        [
+          {
+            "node": "if bot exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if bot exists": {
+      "main": [
+        [
+          {
+            "node": "Set bot id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "create bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create bot": {
+      "main": [
+        [
+          {
+            "node": "Set bot id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if conversation exists": {
+      "main": [
+        [
+          {
+            "node": "Set conversation id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "create conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find conversation": {
+      "main": [
+        [
+          {
+            "node": "if conversation exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create conversation": {
+      "main": [
+        [
+          {
+            "node": "Set conversation id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create customer message": {
+      "main": [
+        [
+          {
+            "node": "create bot message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set customer id": {
+      "main": [
+        [
+          {
+            "node": "Find bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set bot id": {
+      "main": [
+        [
+          {
+            "node": "Find conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set conversation id": {
+      "main": [
+        [
+          {
+            "node": "create customer message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Validation message": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If message from WS": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Find customer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e4afbfdf-5bb0-403a-a800-0cbc457edd29",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39ef54d875d79fedee94e3473632d5c87807de84664473b4a1f1046ef9a50867"
+  },
+  "id": "RMCRxnd0OaserO9D",
+  "tags": []
+}

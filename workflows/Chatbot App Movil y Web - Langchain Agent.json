@@ -1,0 +1,211 @@
+{
+  "name": "Chatbot App Movil y Web - Langchain Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot-app",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "823e5729-d378-4b63-864d-5ebdcca0aee8",
+      "name": "App Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -528,
+        -160
+      ],
+      "typeVersion": 1.1,
+      "webhookId": "af14d70a-a378-45e3-b2e9-8558bbe5ee90",
+      "notes": "Recibe el payload del usuario (e.g. body.message) y el Bearer token (headers.authorization) enviado de forma segura por la aplicación."
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "=# Rol\nEres un asistente virtual experto integrado en una app, especializado en ayudar a los usuarios con las 'novedades de atraso'.\n\n# Objetivo\nGestionar el estatus del usuario y proporcionar enlaces directos para justificar o rectificar atrasos de forma rápida y amigable.\n\n# SOP (Procedimiento Operativo)\n1. **Consulta**: Usa la herramienta 'Consultar Novedades' para revisar el estatus del usuario. Obtendrás un código: 5 (JUSTIFICACION) o 7 (RECTIFICACION).\n2. **Verificación**: Si obtienes el código 5 o 7, llama INMEDIATAMENTE a la herramienta 'Verificar Disponibilidad' enviando el código respectivo.\n3. **Resolución**: Si la acción está disponible, informa al usuario y entrégale el enlace directo.\n   - Enlace web: `https://miapp.com/accion?tipo=[justificacion|rectificacion]`\n   - Enlace móvil: `miapp://pantalla?accion=[justificacion|rectificacion]`\n\n# Instrucciones\n* Responde siempre de forma natural, amigable y empática.\n* Usa formato Markdown para los enlaces.\n* Sé directo y no des información innecesaria."
+        }
+      },
+      "id": "a1fffe69-081b-43dc-8516-1b5162c2f6b9",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -224,
+        -160
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "frequencyPenalty": 0.2,
+          "temperature": 0.5
+        }
+      },
+      "id": "7f67f777-977d-4a58-b692-ba1e99c7c2bf",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -336,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sessionKey": "={{ $('App Webhook Trigger').first().json.headers.authorization }}",
+        "contextWindowLength": 10
+      },
+      "id": "8e433c5f-dd82-4aee-9447-c4fd2859d588",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        -176,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Utiliza esta herramienta PRIMERO cuando el usuario pregunte por sus atrasos o novedades. Retorna código: 5 (JUSTIFICACION) o 7 (RECTIFICACION).",
+        "url": "https://api.tuorganizacion.com/v1/atrasos/novedad",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "id": "a53adc5b-34e8-4536-9425-4568da68d48f",
+      "name": "Consultar Novedades",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        -32,
+        96
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Utiliza esta herramienta DESPUÉS de consultar las novedades si obtienes código 5 o 7. Verifica si la acción sigue disponible para que el usuario la realice.",
+        "method": "POST",
+        "url": "https://api.tuorganizacion.com/v1/atrasos/disponibilidad",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "id": "37d9b58c-8df7-4ab2-9562-f089ecc2d01b",
+      "name": "Verificar Disponibilidad",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        128,
+        96
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        96
+      ],
+      "id": "daf5a7b7-0fec-4efa-9285-f2c90a6be82a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "0c5dv6KOfSKkiDr9",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "App Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Novedades": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Disponibilidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "268f26a8-aac4-4231-af42-15c544744e71",
+  "meta": {
+    "instanceId": "97b1778b729285fac2db9ef698b0a739c83fc508017bacdd2f9ed671bc64ad70"
+  },
+  "id": "TMNksqr2tN1WbeUb",
+  "tags": []
+}

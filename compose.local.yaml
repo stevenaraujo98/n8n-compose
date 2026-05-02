@@ -1,0 +1,78 @@
+name: n8n-local
+
+services:
+  ds_postgres:
+    image: postgres:16
+    container_name: ds_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+    networks:
+      - ds_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} "]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    restart: unless-stopped
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: http --url=${SUBDOMAIN}.${DOMAIN_NAME} --log stdout http://n8n:5678
+    depends_on:
+      - n8n
+    networks:
+      - ds_network
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8ncon
+    hostname: n8n-saac
+    restart: always
+    ports:
+      - "${IP_LOCAL}:5678:5678"
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - N8N_SECURE_COOKIE=false
+      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      - DB_POSTGRESDB_HOST=ds_postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRESDB_SCHEMA=n8n
+    volumes:
+      - n8n_data_local:/home/node/.n8n
+      - ./local-files:/files
+    depends_on:
+      ds_postgres:
+        condition: service_healthy
+    networks:
+      - ds_network
+
+networks:
+  ds_network:
+    driver: bridge
+
+volumes:
+  n8n_data_local:
+  postgres_data_local:
