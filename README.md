@@ -9,6 +9,9 @@ Primer asegurar las variables de entorno o modificar manualmente:
 ```bash
 export POSTGRES_USER=
 export POSTGRES_PASSWORD=
+export DNS_1=
+export DNS_2=
+export DOMAIN=
 ```
 
 Segundo compenzar a crear volumen y contenedores:
@@ -19,7 +22,7 @@ sudo docker volume create n8n_data
 #  En segundo plano
 sudo docker run -d \
  --name n8n \
- --dns 192.168.1.17 --dns 192.168.1.19 \
+ --dns $DNS_1 --dns $DNS_2 \
  --restart unless-stopped \
  --network datalakehouseonpremise_ds_network \
  -p 5678:5678 \
@@ -27,7 +30,7 @@ sudo docker run -d \
  -e TZ="America/Guayaquil" \
  -e N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true \
  -e N8N_SECURE_COOKIE=false \
- -e WEBHOOK_URL="http://192.168.10.59:5678/" \
+ -e WEBHOOK_URL=$DOMAIN \
  -e DB_TYPE=postgresdb \
  -e DB_POSTGRESDB_DATABASE=saacdata \
  -e DB_POSTGRESDB_HOST=ds_postgres \
