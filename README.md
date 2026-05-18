@@ -87,9 +87,9 @@ docker compose -f compose.local.yaml logs -f n8n
 docker compose -f compose.local.yaml logs -f ngrok
 docker compose -f compose.local.yaml logs -f ds_postgres
 
-docker compose -f compose.prod.yaml logs -f 
-docker compose -f compose.prod.yaml logs -f n8n
-docker compose -f compose.prod.yaml logs -f traefik
+sudo docker compose -f compose.prod.yaml logs -f 
+sudo docker compose -f compose.prod.yaml logs -f n8n
+sudo docker compose -f compose.prod.yaml logs -f traefik
 
 
 sudo docker compose stop

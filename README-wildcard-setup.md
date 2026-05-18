@@ -147,6 +147,10 @@ docker logs traefik
 chmod 644 certs/bundle.crt
 chmod 600 certs/star_espol_edu_ec.key
 ```
+⚠️ **Crear network**: Crea la red:
+```bash
+sudo docker network create dataonpremise_n8n_network
+```
 
 ⚠️ **Backup**: Mantén copias de seguridad de tus certificados en un lugar seguro.
 
