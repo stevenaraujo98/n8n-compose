@@ -54,6 +54,13 @@ sudo docker ps
 
 ### Con docker compose  
 Con docker compose  
+
+#### Linux
+```bash
+sudo chown -R mania:mania /var/n8n-compose
+sudo chmod 755 /var/n8n-compose
+```
+
 Para correr y detener
 ```bash
 sudo docker compose up -d
