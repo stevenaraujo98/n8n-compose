@@ -1,0 +1,9 @@
+tls:
+  certificates:
+    - certFile: /certs/bundle.crt
+      keyFile: /certs/star_espol_edu_ec.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/bundle.crt
+        keyFile: /certs/star_espol_edu_ec.key

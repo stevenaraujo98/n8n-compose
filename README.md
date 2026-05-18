@@ -60,7 +60,9 @@ sudo docker compose up -d
 sudo docker compose -f compose.dev.yaml up -d
 sudo docker compose -f compose.test.yaml up -d
 docker compose -f compose.local.yaml up -d
-
+# Para prod
+sudo docker compose -f compose.prod.yaml build
+sudo docker compose -f compose.prod.yaml up -d
 
 sudo docker logs -f n8ncon
 sudo docker logs -f ngrok
@@ -77,6 +79,10 @@ docker compose -f compose.local.yaml logs -f
 docker compose -f compose.local.yaml logs -f n8n
 docker compose -f compose.local.yaml logs -f ngrok
 docker compose -f compose.local.yaml logs -f ds_postgres
+
+docker compose -f compose.prod.yaml logs -f 
+docker compose -f compose.prod.yaml logs -f n8n
+docker compose -f compose.prod.yaml logs -f traefik
 
 
 sudo docker compose stop
