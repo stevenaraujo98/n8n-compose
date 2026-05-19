@@ -48,6 +48,7 @@ services:
 
 networks:
   ds_network:
+    # Se conecta a la red externa que ya existe, en lugar de crear una nueva red para las pruebas 
     external: true
     name: datalakehouseonpremise_ds_network
 
