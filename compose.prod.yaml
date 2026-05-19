@@ -35,9 +35,6 @@ services:
   n8n:
     image: docker.n8n.io/n8nio/n8n
     container_name: n8n
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     restart: always
     # En producción, no es necesario mapear el puerto a la máquina host, ya que Traefik se encargará de enrutar el tráfico al contenedor n8n
     expose:
@@ -67,6 +64,7 @@ services:
       - N8N_PROTOCOL=https
       - NODE_ENV=production
       - N8N_SECURE_COOKIE=true
+      - N8N_PROXY_HOPS=1
       - N8N_DIAGNOSTICS_ENABLED=false
       - N8N_VERSION_NOTIFICATIONS_ENABLED=false
       - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/      
