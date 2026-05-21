@@ -61,7 +61,7 @@ sudo chown -R mania:mania /var/n8n-compose
 sudo chmod 755 /var/n8n-compose
 ```
 
-Para correr y detener
+**Para correr y detener**
 ```bash
 sudo docker compose up -d
 sudo docker compose -f compose.dev.yaml up -d
@@ -109,6 +109,15 @@ sudo docker compose -f compose.prod.yaml down -v --rmi all
 
 docker compose -f compose.local.yaml start
 sudo docker exec -it ds_postgres psql -U postgres -d saacdata -c "DELETE FROM n8n.credentials_entity;"
+```
+
+**Actualizacion de imagen**
+```bash
+sudo git pull
+
+sudo docker compose -f compose.prod.yaml pull
+
+sudo docker compose -f compose.prod.yaml up -d
 ```
 
 #### Compose.dev
