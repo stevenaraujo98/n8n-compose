@@ -118,6 +118,8 @@ sudo git pull
 sudo docker compose -f compose.prod.yaml pull
 
 sudo docker compose -f compose.prod.yaml up -d
+
+sudo docker exec -it traefik traefik version
 ```
 
 #### Compose.dev
