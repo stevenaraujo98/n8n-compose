@@ -119,6 +119,7 @@ sudo docker compose -f compose.prod.yaml pull
 
 sudo docker compose -f compose.prod.yaml up -d
 
+# https://endoflife.date/traefik
 sudo docker exec -it traefik traefik version
 ```
 
