@@ -2,7 +2,7 @@ name: n8n-prod
 
 services:
   traefik:
-    image: traefik:v3.0.2
+    image: traefik
     container_name: traefik
     restart: always
     command:
