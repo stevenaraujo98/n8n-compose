@@ -3,6 +3,16 @@ Change User
 ```bash
 sudo chown -R manager:manager /data/n8n-compose/
 ```
+#### Test coneccion a ip y puerto
+```bash
+nc -zv 192.168.253.6 7087
+telnet 192.168.253.6 7087
+
+curl -I http://192.168.10.37/docs 
+curl -v http://192.168.10.37/docs 
+curl -X GET "URL"
+curl -X GET "URL"
+```
 
 ### Con docker
 Primer asegurar las variables de entorno o modificar manualmente:
