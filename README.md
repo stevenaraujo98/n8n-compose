@@ -1,9 +1,8 @@
 # N8N espol
-Change User
-```bash
-sudo chown -R manager:manager /data/n8n-compose/
-```
-#### Test coneccion a ip y puerto
+Infraestructura de n8n con docker y docker compose.  
+
+### Linux
+Revision IP y puertos
 ```bash
 nc -zv 192.168.253.6 7087
 telnet 192.168.253.6 7087
@@ -12,6 +11,11 @@ curl -I http://192.168.10.37/docs
 curl -v http://192.168.10.37/docs 
 curl -X GET "URL"
 curl -X GET "URL"
+```
+
+Permisos Change User
+```bash
+sudo chown -R manager:manager /var/n8n-compose/
 ```
 
 ### Con docker
