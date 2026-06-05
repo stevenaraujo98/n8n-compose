@@ -2,23 +2,17 @@
 set -e
 
 NODES_DIR=/home/node/.n8n/nodes
-PACKAGE="@fimil/n8n-nodes-ibmi-db2"
 
-# Si el paquete no está compilado correctamente, reinstalarlo
-if [ ! -f "$NODES_DIR/node_modules/@fimil/n8n-nodes-ibmi-db2/node_modules/node-jt400/node_modules/java/build/jvm_dll_path.json" ]; then
-  echo ">>> Instalando/recompilando $PACKAGE..."
-  mkdir -p "$NODES_DIR"
-  cd "$NODES_DIR"
-  
-  # Inicializar package.json si no existe
-  if [ ! -f package.json ]; then
-    npm init -y
-  fi
-  
-  # Instalar con compilación nativa
-  npm install "$PACKAGE" --build-from-source
-  
-  echo ">>> Instalación completada"
+mkdir -p "$NODES_DIR"
+
+# Copiar los community nodes preinstalados al volumen si aún no existen
+if [ ! -d "$NODES_DIR/node_modules/@fimil" ]; then
+  echo ">>> Copiando community nodes preinstalados..."
+  cp -R /opt/custom-nodes/node_modules "$NODES_DIR/"
+  cp /opt/custom-nodes/package.json "$NODES_DIR/" || true
 fi
+
+echo ">>> Verificando package instalado..."
+find "$NODES_DIR" -type f | grep -E "jvm_dll_path.json|IbmiDb2.node.js" || true
 
 exec n8n start

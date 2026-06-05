@@ -1,30 +1,38 @@
-FROM node:22-alpine
+FROM node:20-bookworm-slim
 
-# Variables de entorno de Java
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-ENV PATH=$JAVA_HOME/bin:$PATH
+USER root
 
-# Instalar dependencias del sistema (incluyendo python3 para node-gyp)
-RUN apk add --no-cache \
-    openjdk17-jre-headless \
-    openjdk17-jdk \
+ENV DEBIAN_FRONTEND=noninteractive
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=${JAVA_HOME}/bin:${PATH}
+ENV npm_config_build_from_source=true
+
+RUN apt-get update && apt-get install -y \
+    openjdk-17-jdk \
     python3 \
     make \
     g++ \
-    bash \
     git \
-    curl
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalar n8n globalmente
-RUN npm install -g n8n
+RUN npm install -g n8n@latest
 
-# Crear directorio base (el volumen lo sobreescribirá en runtime)
+# Preinstalar community nodes fuera del volumen persistente
+RUN mkdir -p /opt/custom-nodes && \
+    cd /opt/custom-nodes && \
+    npm init -y && \
+    npm install @fimil/n8n-nodes-ibmi-db2 --unsafe-perm --build-from-source
+
+# Verificación opcional de instalación
+RUN find /opt/custom-nodes -type f | grep -E "jvm_dll_path.json|\.node$" || true
+
 RUN mkdir -p /home/node/.n8n && \
-    chown -R node:node /home/node/.n8n
+    chown -R node:node /home/node
 
-# Copiar entrypoint
-COPY --chown=node:node entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chown node:node /entrypoint.sh
 
 USER node
 WORKDIR /home/node
