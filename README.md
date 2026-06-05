@@ -84,6 +84,7 @@ docker compose -f compose.local.yaml up -d
 # Para prod
 sudo docker compose -f compose.prod.yaml build
 sudo docker compose -f compose.prod.yaml up -d
+sudo docker compose -f compose.prod.yaml up -d --build
 
 sudo docker logs -f n8ncon
 sudo docker logs -f ngrok
