@@ -120,6 +120,7 @@ docker compose -f compose.local.yaml down -v --rmi all
 sudo docker compose -f compose.prod.yaml stop
 sudo docker compose -f compose.prod.yaml down
 sudo docker compose -f compose.prod.yaml down -v --rmi all
+sudo docker compose -f compose.prod.yaml restart n8n
 
 
 docker compose -f compose.local.yaml start

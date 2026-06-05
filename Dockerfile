@@ -19,13 +19,12 @@ RUN apt-get update && apt-get install -y \
 
 RUN npm install -g n8n@latest
 
-# Preinstalar community nodes fuera del volumen persistente
+# Preinstalar SOLO n8n-nodes-ibmi-db2 (sin @fimil)
 RUN mkdir -p /opt/custom-nodes && \
     cd /opt/custom-nodes && \
     npm init -y && \
-    npm install @fimil/n8n-nodes-ibmi-db2 --unsafe-perm --build-from-source
+    npm install n8n-nodes-ibmi-db2 --unsafe-perm --build-from-source
 
-# Verificación opcional de instalación
 RUN find /opt/custom-nodes -type f | grep -E "jvm_dll_path.json|\.node$" || true
 
 RUN mkdir -p /home/node/.n8n && \
