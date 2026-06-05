@@ -79,7 +79,7 @@ services:
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_POSTGRESDB_SCHEMA=n8n
-      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
