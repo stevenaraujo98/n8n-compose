@@ -1,10 +1,10 @@
 FROM node:22-alpine
 
-# Configurar variables de entorno de Java
+# Variables de entorno de Java
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-# Instalar todas las dependencias necesarias
+# Instalar dependencias del sistema (incluyendo python3 para node-gyp)
 RUN apk add --no-cache \
     openjdk17-jre-headless \
     openjdk17-jdk \
@@ -12,29 +12,23 @@ RUN apk add --no-cache \
     make \
     g++ \
     bash \
-    git
+    git \
+    curl
 
 # Instalar n8n globalmente
 RUN npm install -g n8n
 
-# Crear el directorio de nodos comunitarios donde n8n los espera
-# Esto debe hacerse ANTES de cambiar al usuario node
-RUN mkdir -p /home/node/.n8n/nodes && \
+# Crear directorio base (el volumen lo sobreescribirá en runtime)
+RUN mkdir -p /home/node/.n8n && \
     chown -R node:node /home/node/.n8n
 
-# Cambiar al usuario node para instalar el paquete
+# Copiar entrypoint
+COPY --chown=node:node entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER node
-
-# Instalar el paquete de IBM DB2 en el directorio correcto
-WORKDIR /home/node/.n8n/nodes
-RUN npm init -y && \
-    npm install @fimil/n8n-nodes-ibmi-db2 && \
-    cd node_modules/@fimil/n8n-nodes-ibmi-db2 && \
-    npm rebuild
-
-# Volver al directorio de trabajo por defecto
 WORKDIR /home/node
 
 EXPOSE 5678
 
-CMD ["n8n", "start"]
+ENTRYPOINT ["/entrypoint.sh"]
