@@ -1,12 +1,12 @@
 FROM node:20-alpine
 
-# Instalar dependencias del sistema
-RUN apk add --no-cache openjdk17-jre-headless python3 make g++
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
 
-# Instalar n8n globalmente
+RUN apk add --no-cache openjdk17-jre-headless openjdk17-jdk python3 make g++
+
 RUN npm install -g n8n
 
-# Preinstalar el paquete problemático
 RUN mkdir -p /home/node/.n8n/nodes && \
     cd /home/node/.n8n/nodes && \
     npm install @fimil/n8n-nodes-ibmi-db2 && \
