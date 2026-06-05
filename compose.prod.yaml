@@ -33,7 +33,7 @@ services:
       - n8n_network
 
   n8n:
-    image: .
+    build: .
     container_name: n8n
     restart: always
     # En producción, no es necesario mapear el puerto a la máquina host, ya que Traefik se encargará de enrutar el tráfico al contenedor n8n
