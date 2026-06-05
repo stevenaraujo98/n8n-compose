@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:24-alpine
 
 # Variables de entorno de Java
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
