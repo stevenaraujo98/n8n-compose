@@ -59,7 +59,6 @@ services:
       - traefik.http.middlewares.n8n.headers.STSPreload=true
       - traefik.http.routers.n8n.middlewares=n8n@docker
     environment:
-      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
@@ -80,6 +79,8 @@ services:
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_POSTGRESDB_SCHEMA=n8n
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+      - N8N_CUSTOM_EXTENSIONS=/usr/local/lib/custom-nodes
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
