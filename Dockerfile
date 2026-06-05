@@ -3,7 +3,7 @@ FROM node:20-alpine
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-RUN apk add --no-cache openjdk17-jre-headless openjdk17-jdk python3 make g++
+RUN apk add --no-cache openjdk17-jre-headless openjdk17-jdk python3 make g++ bash
 
 RUN npm install -g n8n
 
