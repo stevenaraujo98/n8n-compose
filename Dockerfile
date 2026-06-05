@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
