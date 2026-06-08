@@ -5,6 +5,7 @@ Infraestructura de n8n con docker y docker compose.
 Revision IP y puertos
 ```bash
 nc -zv 192.168.253.6 7087
+nc -zv 192.168.10.59 9000
 telnet 192.168.253.6 7087
 
 curl -I http://192.168.10.37/docs 
@@ -85,6 +86,9 @@ docker compose -f compose.local.yaml up -d
 sudo docker compose -f compose.prod.yaml build
 sudo docker compose -f compose.prod.yaml up -d
 sudo docker compose -f compose.prod.yaml up -d --build
+# Para prod pero reconstruir la imagen limpia
+sudo docker compose -f compose.prod.yaml build --no-cache n8n
+sudo docker compose -f compose.prod.yaml up -d
 
 sudo docker logs -f n8ncon
 sudo docker logs -f ngrok
