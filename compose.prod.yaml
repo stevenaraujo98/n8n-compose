@@ -33,62 +33,96 @@ services:
       - n8n_network
   
   redis:
-    image: redis:alpine
+    image: redis:8.8-alpine
     container_name: n8n_redis
     restart: always
-    # Solo en la red interna, sin puertos expuestos a internet
+    command:
+      - redis-server
+      - "--appendonly"
+      - "yes"
+      - "--requirepass"
+      - "${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
     networks:
-      - n8n_network
+      - queue_network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: minio
     restart: always
     command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-admin}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-password123}
-      # Variables clave para que la consola funcione bajo un sub-directorio
-      - MINIO_SERVER_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
-      - MINIO_BROWSER_REDIRECT_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/minio-console
+      - MINIO_SERVER_URL=https://${MINIO_API_SUBDOMAIN}.${DOMAIN_NAME}
+      - MINIO_BROWSER_REDIRECT_URL=https://${MINIO_CONSOLE_SUBDOMAIN}.${DOMAIN_NAME}
     volumes:
-      # Ruta absoluta en el host
       - /var/minio-buckets:/data
     networks:
       - n8n_network
     labels:
       - traefik.enable=true
 
-      # Router para API / Descargas Públicas
-      # Redirige el tráfico que empiece por el nombre del bucket hacia el puerto 9000
-      - traefik.http.routers.minio-api.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/cdn-manifest`)
+      # Router para API / Descargas Públicas (s3-files.tudominio.com)
+      - traefik.http.routers.minio-api.rule=Host(`${MINIO_API_SUBDOMAIN}.${DOMAIN_NAME}`)
       - traefik.http.routers.minio-api.entrypoints=websecure
       - traefik.http.routers.minio-api.tls=true
+      - traefik.http.routers.minio-api.service=minio-api
       - traefik.http.services.minio-api.loadbalancer.server.port=9000
 
-      # Router para Consola Web de Administración
-      - traefik.http.routers.minio-console.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/minio-console`)
+      # Router para Consola Web de Administración (bucket-store.tudominio.com)
+      - traefik.http.routers.minio-console.rule=Host(`${MINIO_CONSOLE_SUBDOMAIN}.${DOMAIN_NAME}`)
       - traefik.http.routers.minio-console.entrypoints=websecure
       - traefik.http.routers.minio-console.tls=true
+      - traefik.http.routers.minio-console.service=minio-console
       - traefik.http.services.minio-console.loadbalancer.server.port=9001
-      # StripPrefix es necesario para que MinIO no reciba "/minio-console" en sus rutas internas
-      - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/minio-console
-      - traefik.http.routers.minio-console.middlewares=minio-stripprefix
+    healthcheck:
+        test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 10
 
   minio-setup:
     image: minio/mc
     container_name: minio_setup
     depends_on:
-      - minio
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     networks:
       - n8n_network
     entrypoint: >
       /bin/sh -c "
-      sleep 5;
-      mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER:-admin} $${MINIO_ROOT_PASSWORD:-password123};
-      mc mb myminio/cdn-manifest --ignore-existing;
+      set -e;
+
+      mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+
+      mc mb --ignore-existing myminio/cdn-manifest;
+      mc mb --ignore-existing myminio/artifacts-bak;
+
       mc anonymous set download myminio/cdn-manifest;
-      mc mb myminio/artifacts-bak --ignore-existing;
+      mc anonymous set none myminio/artifacts-bak;
+
+      touch /tmp/.keep;
+
+      mc cp /tmp/.keep myminio/cdn-manifest/assets/.keep;
+      mc cp /tmp/.keep myminio/cdn-manifest/chat/.keep;
+      mc cp /tmp/.keep myminio/cdn-manifest/public/.keep;
+
+      mc cp /tmp/.keep myminio/artifacts-bak/backups/.keep;
+      mc cp /tmp/.keep myminio/artifacts-bak/chat/.keep;
+      mc cp /tmp/.keep myminio/artifacts-bak/private/.keep;
+
       exit 0;
       "
 
@@ -146,11 +180,13 @@ services:
       - QUEUE_BULL_REDIS_PORT=6379
       - N8N_RUNNERS_ENABLED=true
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
     networks:
       - n8n_network
+      - queue_network
     depends_on:
       - redis
   
@@ -182,17 +218,24 @@ services:
       - N8N_WORKER_MODE=true
       - N8N_RUNNERS_ENABLED=true
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - ./local-files:/files
     networks:
       - n8n_network
+      - queue_network
     depends_on:
-      - redis
-      - n8n
+      redis:
+        condition: service_healthy
 
 networks:
   n8n_network:
     driver: bridge
 
+  queue_network:
+    driver: bridge
+    internal: true
+
 volumes:
   n8n_data:
+  redis_data:
