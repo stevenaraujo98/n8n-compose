@@ -31,6 +31,66 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - n8n_network
+  
+  redis:
+    image: redis:alpine
+    container_name: n8n_redis
+    restart: always
+    # Solo en la red interna, sin puertos expuestos a internet
+    networks:
+      - n8n_network
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-admin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-password123}
+      # Variables clave para que la consola funcione bajo un sub-directorio
+      - MINIO_SERVER_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - MINIO_BROWSER_REDIRECT_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/minio-console
+    volumes:
+      # Ruta absoluta en el host
+      - /var/minio-buckets:/data
+    networks:
+      - n8n_network
+    labels:
+      - traefik.enable=true
+
+      # Router para API / Descargas Públicas
+      # Redirige el tráfico que empiece por el nombre del bucket hacia el puerto 9000
+      - traefik.http.routers.minio-api.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/cdn-manifest`)
+      - traefik.http.routers.minio-api.entrypoints=websecure
+      - traefik.http.routers.minio-api.tls=true
+      - traefik.http.services.minio-api.loadbalancer.server.port=9000
+
+      # Router para Consola Web de Administración
+      - traefik.http.routers.minio-console.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/minio-console`)
+      - traefik.http.routers.minio-console.entrypoints=websecure
+      - traefik.http.routers.minio-console.tls=true
+      - traefik.http.services.minio-console.loadbalancer.server.port=9001
+      # StripPrefix es necesario para que MinIO no reciba "/minio-console" en sus rutas internas
+      - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/minio-console
+      - traefik.http.routers.minio-console.middlewares=minio-stripprefix
+
+  minio-setup:
+    image: minio/mc
+    container_name: minio_setup
+    depends_on:
+      - minio
+    networks:
+      - n8n_network
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER:-admin} $${MINIO_ROOT_PASSWORD:-password123};
+      mc mb myminio/cdn-manifest --ignore-existing;
+      mc anonymous set download myminio/cdn-manifest;
+      mc mb myminio/artifacts-bak --ignore-existing;
+      exit 0;
+      "
 
   n8n:
     build:
@@ -80,11 +140,55 @@ services:
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_POSTGRESDB_SCHEMA=n8n
       - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+      # Manejo de Colas Redis
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - N8N_RUNNERS_ENABLED=true
+      - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
     networks:
       - n8n_network
+    depends_on:
+      - redis
+  
+  n8n-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: n8n_worker
+    restart: always
+    command: ["worker", "--concurrency", "${N8N_WORKER_CONCURRENCY:-5}"]
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - NODE_ENV=production
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=saacdata
+      - DB_POSTGRESDB_HOST=${POSTGRES_HOST}
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRESDB_SCHEMA=n8n
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+      # Worker y Cola
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - N8N_WORKER_MODE=true
+      - N8N_RUNNERS_ENABLED=true
+      - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+    volumes:
+      - ./local-files:/files
+    networks:
+      - n8n_network
+    depends_on:
+      - redis
+      - n8n
 
 networks:
   n8n_network:

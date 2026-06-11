@@ -344,3 +344,9 @@ volumes:
   n8n_data:
   traefik_data:
 ```
+
+### Integraciones nuevas
+#### Minio
+```bash
+sudo chown -R 1000:1000 /var/minio-buckets
+```
