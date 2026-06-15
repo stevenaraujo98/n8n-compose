@@ -63,11 +63,16 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-admin}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-password123}
       - MINIO_SERVER_URL=https://${MINIO_API_SUBDOMAIN}.${DOMAIN_NAME}
-      - MINIO_BROWSER_REDIRECT_URL=https://${MINIO_CONSOLE_SUBDOMAIN}.${DOMAIN_NAME}
+      # no aplicará externamente
+      - MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
     volumes:
       - /var/minio-buckets:/data
     networks:
       - n8n_network
+    ports:
+      # Expone el puerto 9001 SOLO a la máquina local
+      # Antes no necesitaba porque Traefik enrutaba internamente
+      - "127.0.0.1:9001:9001"
     labels:
       - traefik.enable=true
 
@@ -78,12 +83,12 @@ services:
       - traefik.http.routers.minio-api.service=minio-api
       - traefik.http.services.minio-api.loadbalancer.server.port=9000
 
-      # Router para Consola Web de Administración (bucket-store.tudominio.com)
-      - traefik.http.routers.minio-console.rule=Host(`${MINIO_CONSOLE_SUBDOMAIN}.${DOMAIN_NAME}`)
-      - traefik.http.routers.minio-console.entrypoints=websecure
-      - traefik.http.routers.minio-console.tls=true
-      - traefik.http.routers.minio-console.service=minio-console
-      - traefik.http.services.minio-console.loadbalancer.server.port=9001
+      # # Router para Consola Web de Administración (bucket-store.tudominio.com)
+      # - traefik.http.routers.minio-console.rule=Host(`${MINIO_CONSOLE_SUBDOMAIN}.${DOMAIN_NAME}`)
+      # - traefik.http.routers.minio-console.entrypoints=websecure
+      # - traefik.http.routers.minio-console.tls=true
+      # - traefik.http.routers.minio-console.service=minio-console
+      # - traefik.http.services.minio-console.loadbalancer.server.port=9001
     healthcheck:
         test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
         interval: 10s
