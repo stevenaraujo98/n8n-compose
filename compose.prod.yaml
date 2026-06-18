@@ -20,9 +20,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     volumes:
       # Monta la carpeta de certificados del wildcard (la misma que usa el otro proyecto)
       - ./certs:/certs:ro
@@ -183,7 +180,6 @@ services:
       - EXECUTIONS_MODE=queue
       - QUEUE_BULL_REDIS_HOST=redis
       - QUEUE_BULL_REDIS_PORT=6379
-      - N8N_RUNNERS_ENABLED=true
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
       - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
@@ -221,7 +217,6 @@ services:
       - QUEUE_BULL_REDIS_HOST=redis
       - QUEUE_BULL_REDIS_PORT=6379
       - N8N_WORKER_MODE=true
-      - N8N_RUNNERS_ENABLED=true
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
       - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
