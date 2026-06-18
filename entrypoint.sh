@@ -23,4 +23,8 @@ set -e
 #   echo ">>> Instalación completada"
 # fi
 
-exec n8n start
+if [ "$#" -eq 0 ]; then
+	exec n8n start
+fi
+
+exec n8n "$@"
