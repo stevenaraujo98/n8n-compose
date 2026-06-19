@@ -16,6 +16,10 @@ RUN apk add --no-cache \
     git \
     curl
 
+# Crear el entorno virtual dedicado para n8n de forma global
+RUN python3 -m venv /home/node/venv && \
+    chown -R node:node /home/node/venv
+
 # Instalar n8n globalmente
 RUN npm install -g n8n
 
