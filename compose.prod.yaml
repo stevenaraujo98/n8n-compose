@@ -62,7 +62,7 @@ services:
       - MINIO_SERVER_URL=https://${MINIO_API_SUBDOMAIN}.${DOMAIN_NAME}
       
       # no aplicará externamente
-      - MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
+      - MINIO_BROWSER_REDIRECT_URL=http://200.10.147.140:9001
     volumes:
       - /minio-buckets:/data
     networks:
@@ -184,7 +184,12 @@ services:
       - QUEUE_BULL_REDIS_PORT=6379
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
       - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
+      # Python
       - N8N_NATIVE_PYTHON_RUNNER=true
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_PYTHON_PATH=/usr/bin/python3
+      - N8N_RUNNERS_STDLIB_ALLOW=*
+      - N8N_RUNNERS_EXTERNAL_ALLOW=*
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
@@ -222,7 +227,12 @@ services:
       - N8N_WORKER_MODE=true
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
       - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
+      # Python
       - N8N_NATIVE_PYTHON_RUNNER=true
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_PYTHON_PATH=/usr/bin/python3
+      - N8N_RUNNERS_STDLIB_ALLOW=*
+      - N8N_RUNNERS_EXTERNAL_ALLOW=*
     volumes:
       - ./local-files:/files
     networks:
