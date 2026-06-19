@@ -60,6 +60,7 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-admin}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-password123}
       - MINIO_SERVER_URL=https://${MINIO_API_SUBDOMAIN}.${DOMAIN_NAME}
+      
       # no aplicará externamente
       - MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
     volumes:
@@ -69,7 +70,8 @@ services:
     ports:
       # Expone el puerto 9001 SOLO a la máquina local
       # Antes no necesitaba porque Traefik enrutaba internamente
-      - "127.0.0.1:9001:9001"
+      # - "127.0.0.1:9001:9001"
+      - "0.0.0.0:9001:9001"
     labels:
       - traefik.enable=true
 
@@ -182,6 +184,7 @@ services:
       - QUEUE_BULL_REDIS_PORT=6379
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
       - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - N8N_NATIVE_PYTHON_RUNNER=true
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
@@ -219,6 +222,7 @@ services:
       - N8N_WORKER_MODE=true
       - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
       - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - N8N_NATIVE_PYTHON_RUNNER=true
     volumes:
       - ./local-files:/files
     networks:

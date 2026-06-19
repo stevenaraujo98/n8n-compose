@@ -4,11 +4,12 @@ FROM node:24-alpine
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-# Instalar dependencias del sistema (incluyendo python3 para node-gyp)
+# Instalar dependencias del sistema (incluyendo python3 y pip para el task runner)
 RUN apk add --no-cache \
     openjdk17-jre-headless \
     openjdk17-jdk \
     python3 \
+    py3-pip \
     make \
     g++ \
     bash \

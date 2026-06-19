@@ -1,24 +1,6 @@
 # N8N espol
 Infraestructura de n8n con docker y docker compose.  
 
-### Linux
-Revision IP y puertos
-```bash
-nc -zv 192.168.253.6 7087
-nc -zv 192.168.10.59 9000
-telnet 192.168.253.6 7087
-
-curl -I http://192.168.10.37/docs 
-curl -v http://192.168.10.37/docs 
-curl -X GET "URL"
-curl -X GET "URL"
-```
-
-Permisos Change User
-```bash
-sudo chown -R manager:manager /var/n8n-compose/
-```
-
 ### Con docker
 Primer asegurar las variables de entorno o modificar manualmente:
 ```bash
@@ -71,9 +53,39 @@ sudo docker ps
 Con docker compose  
 
 #### Linux
+Revision IP y puertos
 ```bash
-sudo chown -R mania:mania /var/n8n-compose
-sudo chmod 755 /var/n8n-compose
+nc -zv 192.168.253.6 7087
+nc -zv 192.168.10.59 9000
+telnet 192.168.253.6 7087
+
+curl -I http://192.168.10.37/docs 
+curl -v http://192.168.10.37/docs 
+curl -X GET "URL"
+curl -X GET "URL"
+```
+
+Permisos Change User
+```bash
+sudo chown -R manager:manager /n8n-compose/
+```
+
+```bash
+sudo chown -R mania:mania /n8n-compose
+sudo chmod 755 /n8n-compose
+```
+
+### Windows
+REvision de rutas
+```bash
+nslookup
+# luego la url
+```
+
+Revision puertos
+```bash
+telnet "example.com" 443
+Test-NetConnection -ComputerName "example.com" -Port 443
 ```
 
 **Para correr y detener**
