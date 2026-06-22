@@ -91,16 +91,19 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_N8N_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_N8N_SECRET_KEY: ${MINIO_SECRET_KEY}
     networks:
       - n8n_network
     entrypoint: >
       /bin/sh -c "
-      set -e;
       mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
       mc mb --ignore-existing myminio/cdn-manifest;
       mc mb --ignore-existing myminio/artifacts-bak;
-      mc anonymous set download myminio/cdn-manifest;
+      printf '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::cdn-manifest/*\"]}]}' > /tmp/cdn-policy.json;
+      mc anonymous set-json /tmp/cdn-policy.json myminio/cdn-manifest;
       mc anonymous set none myminio/artifacts-bak;
+      mc admin user svcacct add myminio $${MINIO_ROOT_USER} --access-key $${MINIO_N8N_ACCESS_KEY} --secret-key $${MINIO_N8N_SECRET_KEY} || true;
       touch /tmp/.keep;
       mc cp /tmp/.keep myminio/cdn-manifest/assets/.keep;
       mc cp /tmp/.keep myminio/cdn-manifest/chat/.keep;
@@ -108,7 +111,7 @@ services:
       mc cp /tmp/.keep myminio/artifacts-bak/backups/.keep;
       mc cp /tmp/.keep myminio/artifacts-bak/chat/.keep;
       mc cp /tmp/.keep myminio/artifacts-bak/private/.keep;
-      exit 0;
+      echo 'Setup completado';
       "
 
   # ─── n8n MAIN ────────────────────────────────────────────────────────────────
@@ -275,7 +278,7 @@ services:
   #     - N8N_NATIVE_PYTHON_RUNNER=true
   #   volumes:
   #     - ./local-files:/files
-  #   networks:
+  #   networks: 
   #     - n8n_network
   #     - queue_network
   #   depends_on:
