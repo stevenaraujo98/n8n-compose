@@ -12,7 +12,7 @@ RUN apk add --no-cache \
     git \
     curl
 
-RUN npm install -g n8n@2.26.8
+RUN npm install -g n8n@2.38.5
 
 RUN mkdir -p /home/node/.n8n && \
     chown -R node:node /home/node/.n8n
