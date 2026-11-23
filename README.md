@@ -120,8 +120,11 @@ docker compose -f compose.local.yaml logs -f ds_postgres
 
 sudo docker compose -f compose.prod.yaml logs -f 
 sudo docker compose -f compose.prod.yaml logs -f n8n
+sudo docker compose -f compose.prod.yaml ps traefik
 sudo docker compose -f compose.prod.yaml logs -f traefik
 
+# actualizar la configuracion
+sudo docker compose -f compose.prod.yaml up -d --no-deps traefik
 
 sudo docker compose stop
 # down ese comando elimina los contenedores.
