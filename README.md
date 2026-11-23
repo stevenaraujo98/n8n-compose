@@ -168,8 +168,12 @@ Ejecuta los comandos en el servidor de producción, desde el directorio que
 contiene `compose.prod.yaml`. Coloca el certificado nuevo
 (`star_espol_edu_ec.crt`), los intermedios (`DigiCertCA.crt`) y la clave
 privada nueva (`wildcardespol.key`) en `certs/`. Los archivos deben estar en
-formato PEM. En el bundle va primero el certificado del dominio, seguido de
-los intermedios en orden de emisión.
+formato PEM. 
+`bundle.crt` está en formato PEM aunque su extensión sea `.crt`. Si ambos
+archivos contienen bloques delimitados por `-----BEGIN CERTIFICATE-----` y
+`-----END CERTIFICATE-----`, basta con concatenarlos. 
+En el bundle va primero el certificado del dominio, seguido de los intermedios 
+en orden de emisión.
 
 Ejecuta este bloque desde el directorio que contiene `compose.prod.yaml`.
 Genera un solo `bundle.crt`, instala la clave con el nombre configurado en
