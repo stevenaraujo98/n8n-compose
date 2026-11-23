@@ -155,6 +155,58 @@ sudo docker compose -f compose.prod.yaml up -d
 sudo docker exec -it traefik traefik version
 ```
 
+### Certificados TLS con Traefik
+
+En producción, [compose.prod.yaml](compose.prod.yaml) monta `./certs` en
+`/certs` y carga [traefik-certs.yml](traefik-certs.yml) mediante el proveedor
+de archivos de Traefik. El mismo certificado se registra para los routers HTTPS
+de n8n y MinIO y como certificado predeterminado del almacén TLS.
+
+#### Renovación en producción
+
+Ejecuta los comandos en el servidor de producción, desde el directorio que
+contiene `compose.prod.yaml`. Coloca el certificado nuevo
+(`star_espol_edu_ec.crt`), los intermedios (`DigiCertCA.crt`) y la clave
+privada nueva (`wildcardespol.key`) en `certs/`. Los archivos deben estar en
+formato PEM. En el bundle va primero el certificado del dominio, seguido de
+los intermedios en orden de emisión.
+
+Ejecuta este bloque desde el directorio que contiene `compose.prod.yaml`.
+Genera un solo `bundle.crt`, instala la clave con el nombre configurado en
+Traefik y reinicia el servicio.
+
+```bash
+{ cat certs/star_espol_edu_ec.crt && printf '\n' && cat certs/DigiCertCA.crt; } > certs/bundle.crt.new &&
+  sudo install -m 0600 certs/wildcardespol.key certs/star_espol_edu_ec.key &&
+  sudo mv certs/bundle.crt certs/bundle.crt.old &&
+  sudo mv certs/bundle.crt.new certs/bundle.crt &&
+  sudo docker compose -f compose.prod.yaml restart traefik
+```
+
+Revisa los logs de Traefik después del reinicio.
+
+```bash
+sudo docker compose -f compose.prod.yaml logs --since 5m traefik
+```
+
+#### Desarrollo
+
+[compose.dev.yaml](compose.dev.yaml) publica n8n por HTTP en el puerto
+`5678`. Para usar HTTPS local con certificados de mkcert se necesita un proxy
+local que termine TLS. Si se usa Traefik para ese propósito, su configuración
+dinámica debe apuntar al certificado y a la clave locales. Usa en el
+certificado el nombre o la IP con que accederás desde el navegador.
+
+Con mkcert instalado, registra su CA local en el equipo desde el que vas a
+navegar y genera los archivos en un directorio aparte del de producción.
+
+```bash
+mkcert -install
+mkdir -p certs-dev
+mkcert -cert-file certs-dev/cert.pem -key-file certs-dev/key.pem localhost 127.0.0.1
+```
+
+### Compose
 #### Compose.dev
  ```bash
 services:
